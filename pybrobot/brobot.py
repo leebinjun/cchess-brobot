@@ -3,7 +3,6 @@ import config
 
 
 import serial
-
 import threading
 import time
 
