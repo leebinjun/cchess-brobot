@@ -114,7 +114,7 @@ if __name__ == "__main__":
     command = msg.bytes()  
     print("connect: ", command[4:].replace(r"\0x", " "))
 
-    # 按键确认位置
+    # 按键确认位置/准备位置
     msg = Message()
     msg.header   = bytes([0xBB, 0xBB])
     msg.len = 18
@@ -123,9 +123,14 @@ if __name__ == "__main__":
     msg.params = bytearray([])
     height = 50
     msg.params.extend(getparams(height))
-    msg.params.extend(bytearray([0x01, 0x00, 0xEC, 0x49,
-                                 0x01, 0x00, 0xB4, 0x40,
-                                 0x00, 0x00, 0x94, 0x25 ]))
+    # (x, y, z) = config.POS_READY
+    x, y, z = -192.48, -146.13, 132.58
+    msg.params.extend(getparams(x))
+    msg.params.extend(getparams(y))
+    msg.params.extend(getparams(z))
+    # msg.params.extend(bytearray([0x01, 0x00, 0xEC, 0x49,
+    #                              0x01, 0x00, 0xB4, 0x40,
+    #                              0x00, 0x00, 0x94, 0x25 ]))
     command = msg.bytes()
     print("button: ", command[4:].replace(r"\0x", " "))
 
@@ -140,7 +145,6 @@ if __name__ == "__main__":
     ans = msg.bytes()
     print("sucker: ", ans[4:].replace(r"\0x", " "))
 
-
     # 速率  
     # BB BB 06 42 03 00 00 01 00 BA
     msg = Message()
@@ -152,7 +156,6 @@ if __name__ == "__main__":
     msg.params.extend(getparams(speedrate))
     ans = msg.bytes()
     print("speed: ", ans[4:].replace(r"\0x", " "))
-
 
     #到某一点 door  
     # BB BB 12 48 04 00 00 1E 00 00 00 96 00 01 01 90 00 00 00 91 00 DD

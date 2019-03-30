@@ -1,7 +1,6 @@
 from message import Message
 import config
 
-
 import serial
 import threading
 import time
@@ -34,8 +33,7 @@ class Brobot(threading.Thread):
         is_open = self.ser.isOpen()
         if self.isShow:
             print('pydobot: %s open' % self.ser.name if is_open else 'failed to open serial port')
-        # self._set_ptp_coordinate_params(velocity=200.0, acceleration=200.0)
-        # self._set_ptp_common_params(velocity=200.0, acceleration=200.0)
+        self.go_ready_pos()
         self.start()
 
     def run(self):
@@ -184,10 +182,11 @@ class Brobot(threading.Thread):
         msg.params = bytearray([])
         height = 50
         msg.params.extend(getparams(height))
-        msg.params.extend(bytearray([0x01, 0x00, 0xEC, 0x49,
-                                    0x01, 0x00, 0xB4, 0x40,
-                                    0x00, 0x00, 0x94, 0x25 ]))
-        # command = msg.bytes()
+        # BB BB 12 48 04 00 00 32 00 | 01 00 C0 30 | 01 00 92 0D | 00 00 84 3A | 33
+        msg.params.extend(bytearray([0x01, 0x00, 0xC0, 0x30,
+                                     0x01, 0x00, 0x92, 0x0D,
+                                     0x00, 0x00, 0x84, 0x3A ]))
+        # command = msg.bytes() 
         # print("button: ", command[4:].replace(r"\0x", " "))
         self._send_message(msg)
 
@@ -207,12 +206,13 @@ class Brobot(threading.Thread):
 
     # 判断机械臂是否运动到目标点
     def isMoveOver(self , xx, yy, zz, error_value):
-        # 循环看机械臂的实时位置是否到目标位置，如果到目标位置则退出循环
         while True:
             time.sleep(0.05)
             # 机械臂理论坐标误差在0.5mm以内,实际误差控制在2mm以内
             if (self.x >= xx - error_value and self.x <= xx + error_value) and (self.y >= yy - error_value and self.y <= yy + error_value) and (self.z >= zz - error_value and self.z <= zz + error_value):
                 break
+
+
 
 if __name__ == "__main__":
    
@@ -243,6 +243,7 @@ if __name__ == "__main__":
     times = 3
     device.connect()
     device.set_control_signal(config.CTRL_BEGIN)
+    device.set_speedrate(config.SPEEDRATE)
 
     for i in range(times):
         device.print_pose()
