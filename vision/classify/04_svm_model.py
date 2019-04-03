@@ -1,3 +1,5 @@
+# 载入数据，训练svm模型
+
 import numpy as np
 from sklearn import datasets
 

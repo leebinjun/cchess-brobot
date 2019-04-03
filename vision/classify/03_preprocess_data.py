@@ -1,3 +1,5 @@
+# 提hog特征，制作Xy数据集
+
 import cv2
 import numpy as np
 
