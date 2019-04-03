@@ -26,31 +26,31 @@ param5_name = 'maxRadius'
 def on_param1_thresh_trackbar(val):
     global minDist
     minDist = max(val, 0)
-    cv.setTrackbarPos(param1_name, window_detection_name, minDist)
+    cv.setTrackbarPos(param1_name, window_trackbar_name, minDist)
 
 def on_param2_thresh_trackbar(val):
     global param1
     param1 = max(val, 0)
-    cv.setTrackbarPos(param2_name, window_detection_name, param1)
+    cv.setTrackbarPos(param2_name, window_trackbar_name, param1)
 
 def on_param3_thresh_trackbar(val):
     global param2
     param2 = max(val, 0)
-    cv.setTrackbarPos(param3_name, window_detection_name, param2)
+    cv.setTrackbarPos(param3_name, window_trackbar_name, param2)
 
 def on_param4_thresh_trackbar(val):
     global minRadius
     global maxRadius
     minRadius = val
     minRadius = min(maxRadius-1, minRadius)
-    cv.setTrackbarPos(param4_name, window_detection_name, minRadius)
+    cv.setTrackbarPos(param4_name, window_trackbar_name, minRadius)
 
 def on_param5_thresh_trackbar(val):
     global minRadius
     global maxRadius
     maxRadius = val
     maxRadius = max(maxRadius, minRadius+1)
-    cv.setTrackbarPos(param5_name, window_detection_name, maxRadius)
+    cv.setTrackbarPos(param5_name, window_trackbar_name, maxRadius)
 
 parser = argparse.ArgumentParser(description='Code for Thresholding Operations using inRange tutorial.')
 parser.add_argument('--camera', help='Camera devide number.', default=0, type=int)
