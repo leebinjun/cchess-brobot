@@ -6,7 +6,7 @@ import time
 import numpy as np
 import cv2
 from vision.svm_classify import Identify
-
+from strategy.moonfish.moonfish_strategy import StrategyMoonfish
 
 
 RED = 1
@@ -17,19 +17,29 @@ class Player:
     def __init__(self, color = RED):
         self.color = color
         
+        self.board = []
         self.current_board = np.zeros(90)  #记录当前轮红棋位置
         self.last_board    = np.zeros(90)  #记录上一轮红棋位置
-        self.board = np.array([[1, 2, 3, 4, 5, 4, 3, 2, 1],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 6, 0, 0, 0, 0, 0, 6, 0],
-                               [7, 0, 7, 0, 7, 0, 7, 0, 7],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                               [0, 0, 0, 0, 0, 0, 0, 0, 0]], dtype = np.int16)
-
+        self.board_w = np.array([[1, 2, 3, 4, 5, 4, 3, 2, 1],
+                                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                 [0, 6, 0, 0, 0, 0, 0, 6, 0],
+                                 [7, 0, 7, 0, 7, 0, 7, 0, 7],
+                                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                 [0, 0, 0, 0, 0, 0, 0, 0, 0]], dtype = np.int16)
+        self.board_b = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                 [7, 0, 7, 0, 7, 0, 7, 0, 7],
+                                 [0, 6, 0, 0, 0, 0, 0, 6, 0],
+                                 [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                 [1, 2, 3, 4, 5, 4, 3, 2, 1]], dtype = np.int16)
         self.ident = Identify()
         self.cap = cv2.VideoCapture(0)
     
@@ -63,8 +73,9 @@ class Player:
             if sum(self.last_board) == 16:
                 print("initial board .....\nDone.")
                 break
-        
-    def update_board(self, isShow = False):
+
+    # 由视觉获取当前红棋局面
+    def update_board_w(self, isShow = False):
         ret, img = self.cap.read()
         # 更新board
         while ret is True:
@@ -97,30 +108,106 @@ class Player:
             # 计算移动棋子，更新last_board
             # AI吃子时，应该更新last_board -1
             # print("sum:", sum(current_board))
-            if sum(self.current_board) == sum(self.last_board):
+            if sum(self.current_board) == sum(self.last_board) or sum(self.current_board) == sum(self.last_board)-1:
                 change_board = self.current_board - self.last_board
                 id_new  =  np.where(change_board == 1)[0]
                 id_last =  np.where(change_board == -1)[0]
-                if id_new.size and id_last.size:
+                if id_new.size == 1 and id_last.size == 1:
                     # print("id: ", id_new, id_last)
-                    tmp = self.board[id_last//9 ,id_last%9]
-                    self.board[id_new//9, id_new%9] = tmp
-                    self.board[id_last//9, id_last%9] = 0
+                    tmp = self.board_w[id_last//9, id_last%9]
+                    self.board_w[id_new//9, id_new%9] = tmp
+                    self.board_w[id_last//9, id_last%9] = 0
                     self.last_board = self.current_board
                     break
         print("board:")
-        print(self.board)
-    
+        print(self.board_w)
+
+    # 由策略更新局面
+    def update_board_b(self, move, isShow = False):
+        
+        for i in range(10):
+            for j in range(9):
+                if self.board[i][j].isupper() and self.board_b[i][j] != 0:
+                    self.board_b[i][j] = 0
+
+        new_y  = ord(move[2]) - ord('a')
+        new_x  = int(move[3])
+        last_y = ord(move[0]) - ord('a')  #h
+        last_x = int(move[1])             #7
+       
+        tmp = self.board_b[last_x, last_y]
+        self.board_b[new_x, new_y] = tmp
+        self.board_b[last_x, last_y] = 0
+        
+        # print("board_b:")
+        # print(self.board_b)
+
+        return [new_y, new_x, last_y, last_x]
+
+                                
+
+
+    def board_to_situation(self):
+        adict = {1:'r', 2:'n', 3:'b', 4:'a', 5:'k', 6:'c', 7:'p', 0:'0'}
+        self.board = []
+        # 考虑黑子被吃子情况，先红后黑！！！
+        for i in range(10):
+            self.board.append([])
+            for j in range(9):
+                tmp = adict.get(self.board_w[i, j]).upper()
+                self.board[i].append(tmp)
+        for i in range(10):
+            for j in range(9):
+                if self.board[i][j] == '0':
+                    self.board[i][j] = adict.get(self.board_b[i, j])
+        # print("board_b:", self.board_b)
+        # print("board_w:", self.board_w)
+        import pprint
+        print("board:")
+        pprint.pprint(self.board)
+        situation = []
+        for i in range(10):
+            count = 0
+            for j in range(9):
+                if self.board[i][j] != '0':
+                    if count != 0:
+                        situation.append(str(count))
+                        situation.append(self.board[i][j])
+                        count = 0
+                    else:
+                        situation.append(self.board[i][j])
+                else:
+                    count += 1
+            if count != 0:
+                situation.append(str(count))
+            situation.append("/")
+        situation = situation[:-1]
+        situation.reverse()
+        res = "".join(situation)
+        # print(res)
+        return res
 
 if __name__ == "__main__":
 
     aplayer = Player()
-
+    amoonfish = StrategyMoonfish()
     aplayer.initial_board()
 
     while True:
-        aplayer.update_board()
+        aplayer.update_board_w()
         cv2.waitKey(500)
+        situation = aplayer.board_to_situation()
+        print(situation)
+        # situation = "rCbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/7C1/9/RNBAKABNR"
+        move = amoonfish.get_move(position=situation, show_thinking = False)
+        print(move)
+        aplayer.update_board_b(move)
+        situation = aplayer.board_to_situation()
+        
+
+
+
+
 
 
 
