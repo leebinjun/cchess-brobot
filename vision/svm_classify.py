@@ -1,4 +1,3 @@
-
 import numpy as np
 from utils import get_feature_1, get_feature_2
 import cv2
@@ -18,12 +17,14 @@ class Identify():
                  svm_2_path = r".\vision\svm_2.mat"):
         print("载入模型")
         print("start time:", time.time())
-        self.svm_1 = cv2.ml.SVM_load(svm_1_path)
-        self.svm_2 = cv2.ml.SVM_load(svm_2_path)
+        if svm_1_path:
+            self.svm_1 = cv2.ml.SVM_load(svm_1_path)
+        if svm_2_path:
+            self.svm_2 = cv2.ml.SVM_load(svm_2_path)
         print("end time:", time.time())
 
     def chessidentify_1(self, image):
-        
+        # 识别棋子
         '''开始预测'''
         X_data = []
         X_data.append(get_feature_1(None, img = image))
@@ -37,6 +38,7 @@ class Identify():
         return y1_pred
   
     def chessidentify_2(self, image):
+        # 红黑二分类
         X_data = []
         X_data.append(get_feature_2(None, img = image))
         X = np.array(X_data)
@@ -60,5 +62,5 @@ if __name__ == '__main__':
     
     img = cv2.imread(img_path)
 
-    ret1, ret2 = ident.chessidentify(img)
+    ret1, ret2 = ident.chessidentify_1(img)
     print("ret:", ret1, ret2)
