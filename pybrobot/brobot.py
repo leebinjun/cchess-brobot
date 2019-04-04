@@ -23,6 +23,7 @@ class Brobot(threading.Thread):
     x = 0.0
     y = 0.0
     z = 0.0
+    pieceboard_id = 0
 
     def __init__(self, port, isShow=False):
         threading.Thread.__init__(self)
@@ -215,27 +216,44 @@ class Brobot(threading.Thread):
             if (self.x >= xx - error_value and self.x <= xx + error_value) and (self.y >= yy - error_value and self.y <= yy + error_value) and (self.z >= zz - error_value and self.z <= zz + error_value):
                 break
 
-    def move(self, alist):
+    # 机械臂走子：吃子 拿子 落子
+    def move(self, alist, capture = False):
         [new_y, new_x, last_y, last_x] = alist
         new_id  = (9-new_x)*9 + new_y
         last_id = (9-last_x)*9 + last_y
 
         self.print_pose()
         
+        # 吃子的情况
+        if capture:
+            idx = self.pieceboard_id
+            self.pieceboard_id += 1
+            (x, y) = config.CHESSBOARD[new_id]
+            pos = (x, y, 135)
+            self.go_door_move( 30, pos)
+            self.isMoveOver(x, y, 135, 1)
+            self.go_air_pump(config.PUMP_SUCK)
+            time.sleep(0.5)
+            (x, y) = config.PIECEBOARD[idx]
+            pos = (x, y, 132)
+            self.go_door_move( 30, pos)
+            self.isMoveOver(x, y, 132, 1)
+            self.go_air_pump(config.PUMP_STOP)
+
         (x, y) = config.CHESSBOARD[last_id]
         pos = (x, y, 132)
         self.go_door_move( 30, pos)
-        self.isMoveOver(x, y, 132, 2)
+        self.isMoveOver(x, y, 132, 1)
         self.go_air_pump(config.PUMP_SUCK)
-        time.sleep(2)
+        time.sleep(0.5)
         (x, y) = config.CHESSBOARD[new_id]
         pos = (x, y, 135)
         self.go_door_move( 30, pos)
         self.isMoveOver(x, y, 135, 1)
         self.go_air_pump(config.PUMP_STOP)
-        time.sleep(1)
+        time.sleep(0.5)
         self.go_ready_pos()
-
+        time.sleep(5)
 
 
 
@@ -243,7 +261,13 @@ class Brobot(threading.Thread):
 if __name__ == "__main__":
    
     device = Brobot(port='com3', isShow=True)
-    
+
+    device.connect()
+    device.set_speedrate(config.SPEEDRATE)
+    device.set_control_signal(config.CTRL_BEGIN)
+    device.go_ready_pos()
+    time.sleep(5)
+
     # # 连续查看坐标
     # times = 30 #s
     # for i in range(times):
@@ -265,28 +289,28 @@ if __name__ == "__main__":
     # device.set_control_signal(config.CTRL_END)
     # device.disconnect()
 
-    # 测试times次走子运动
-    times = 3
-    device.connect()
-    device.set_control_signal(config.CTRL_BEGIN)
-    device.set_speedrate(config.SPEEDRATE)
+    # # 测试times次走子运动
+    # times = 3
+    # device.connect()
+    # device.set_control_signal(config.CTRL_BEGIN)
+    # device.set_speedrate(config.SPEEDRATE)
 
-    for i in range(times):
-        device.print_pose()
-        idx = int(input("input:"))
-        (x, y) = config.PIECEBOARD[i]
-        pos = (x, y, 132)
-        device.go_door_move( 30, pos)
-        device.isMoveOver(x, y, 132, 2)
-        device.go_air_pump(config.PUMP_SUCK)
-        time.sleep(2)
-        (x, y) = config.CHESSBOARD[idx]
-        pos = (x, y, 135)
-        device.go_door_move( 30, pos)
-        device.isMoveOver(x, y, 135, 1)
-        device.go_air_pump(config.PUMP_STOP)
-        time.sleep(1)
-        device.go_ready_pos()
+    # for i in range(times):
+    #     device.print_pose()
+    #     idx = int(input("input:"))
+    #     (x, y) = config.PIECEBOARD[i]
+    #     pos = (x, y, 132)
+    #     device.go_door_move( 30, pos)
+    #     device.isMoveOver(x, y, 132, 2)
+    #     device.go_air_pump(config.PUMP_SUCK)
+    #     time.sleep(0.5)
+    #     (x, y) = config.CHESSBOARD[idx]
+    #     pos = (x, y, 135)
+    #     device.go_door_move( 30, pos)
+    #     device.isMoveOver(x, y, 135, 1)
+    #     device.go_air_pump(config.PUMP_STOP)
+    #     time.sleep(0.5)
+    #     device.go_ready_pos()
 
     device.set_control_signal(config.CTRL_END)
     device.disconnect()

@@ -100,7 +100,9 @@ class Player:
                 id_y = (4 - (y-230)//40) if y > 220 else (9 - (y-10)//40)
                 id_x, id_y = id_x, 9-id_y
                 img_sub = img_trans[y-10:y+10, x-10:x+10, :]
-                assert img_sub.shape == (20, 20, 3)
+                # assert img_sub.shape == (20, 20, 3)
+                if img_sub.shape != (20, 20, 3):
+                    break
                 res = self.ident.chessidentify_2(img_sub)
                 if res[0] == 1:
                     self.current_board[id_x + id_y*9] = 1    
@@ -124,7 +126,7 @@ class Player:
         print("board_w:")
         print(self.board_w)
 
-    # 由策略更新局面
+    # 由策略更新局面，得到机械臂运动目标
     def update_board_b(self, move, isShow = False):
         
         for i in range(10):
@@ -144,11 +146,14 @@ class Player:
         print("board_b:")
         print(self.board_b)
 
-        return [new_y, new_x, last_y, last_x]
+        flag_capture = False
+        # 判读是否吃子
+        if self.board[new_x][new_y].isupper():
+            flag_capture = True
 
-                                
+        return [new_y, new_x, last_y, last_x], flag_capture
 
-
+    # 由局面board生成ucci通信局面描述字符串
     def board_to_situation(self):
         adict = {1:'r', 2:'n', 3:'b', 4:'a', 5:'k', 6:'c', 7:'p', 0:'0'}
         self.board = []
@@ -201,15 +206,15 @@ if __name__ == "__main__":
     device.go_ready_pos()
 
     while True:
-        aplayer.update_board_w()
+        aplayer.update_board_w(isShow = True)
         cv2.waitKey(500)
         situation = aplayer.board_to_situation()
         print(situation)
         # situation = "rCbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/7C1/9/RNBAKABNR"
-        move = amoonfish.get_move(position=situation, times = 5000, depth = 7, show_thinking = False)
+        move = amoonfish.get_move(position=situation, times = 10000, depth = 10, show_thinking = True)
         print(move)
-        alist = aplayer.update_board_b(move)
-        device.move(alist)
+        alist, flag_capture = aplayer.update_board_b(move)
+        device.move(alist, capture = flag_capture)
         situation = aplayer.board_to_situation()
         cv2.waitKey(500)
         
