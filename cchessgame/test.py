@@ -5,6 +5,7 @@
 import sys,os
 sys.path.append(os.path.dirname(__file__) + os.sep + '../')
 
+from utils import *
 import time
 import numpy as np
 import cv2
@@ -26,15 +27,7 @@ board = np.array([[1, 2, 3, 4, 5, 4, 3, 2, 1],
                   [0, 0, 0, 0, 0, 0, 0, 0, 0]], dtype = np.int16)
 
 
-def perTrans(img, points = [(88, 475), (538, 475), (88, 38), (538, 38)]):
-    # points: U L D R 4 points
-    dst = np.float32([[0,0],[0,439],[439,0],[439,439]])
-    src = np.float32(points)
-    M = cv2.getPerspectiveTransform(src, dst)
-    T = cv2.warpPerspective(img,M,(440,440))
-    ROI = np.zeros((440,440,3),np.uint8)
-    ROI[0:,0:440] = T
-    return ROI
+
 
 
 def drawRect(image):

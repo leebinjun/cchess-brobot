@@ -157,6 +157,15 @@ def get_feature_1(img_path, img = None):
     return feature
 
 
-
+# 截取棋盘
+def perTrans(img, points = [(88, 475), (538, 475), (88, 38), (538, 38)]):
+    # points: U L D R 4 points
+    dst = np.float32([[0,0],[0,439],[439,0],[439,439]])
+    src = np.float32(points)
+    M = cv2.getPerspectiveTransform(src, dst)
+    T = cv2.warpPerspective(img,M,(440,440))
+    ROI = np.zeros((440,440,3),np.uint8)
+    ROI[0:,0:440] = T
+    return ROI
 
 
