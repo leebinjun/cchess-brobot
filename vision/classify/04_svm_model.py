@@ -33,20 +33,20 @@ X = X.astype(np.float32)
 '''分离数据'''
 from sklearn import model_selection as ms
 X_train, X_test, y_train, y_test = ms.train_test_split(
-    X, y, test_size=0.2, random_state=42
+    X, y, test_size=0.3, random_state=42
 )
 
-for D in [4.7]:
+for D in [0.05]:
     param = D
     print("param:", param)
     import cv2
     svm = cv2.ml.SVM_create()
     svm.setType(cv2.ml.SVM_C_SVC)
-    svm.setDegree(D)
+    svm.setDegree(4.8)
     svm.setKernel(cv2.ml.SVM_POLY)
     # svm.setKernel(cv2.ml.SVM_RBF)
     svm.setC(1)
-    svm.setGamma(0.05)
+    svm.setGamma(D)
 
 
     '''开始训练'''
@@ -69,9 +69,9 @@ for D in [4.7]:
     '''用scikit-learn的metrics模块计算准确率'''
     from sklearn import metrics
     print(metrics.accuracy_score(y_test, y_pred))
-    for (a, b) in zip(y_test, y_pred):
-        if a != int(b):
-            print(a, b)
+    # for (a, b) in zip(y_test, y_pred):
+    #     if a != int(b):
+    #         print(a, b)
 
 
 

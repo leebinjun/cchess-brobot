@@ -61,7 +61,7 @@ def get_feature(filepath):
 
 
 if __name__ == '__main__':
-    img_path = r".\vision\classify\data\50\test1554022823.2650917.jpg"
+    img_path = r".\vision\classify\data\test1554312547.8920143.jpg"
     X_data = []
     X_data.append(get_feature(img_path))
     

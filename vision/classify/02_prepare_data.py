@@ -1,7 +1,5 @@
 # 开摄像头，找圆，截图，准备数据
 
-
-
 import cv2
 import argparse
 
@@ -47,20 +45,21 @@ while ret is True:
     if key == ord('q') or key == 27:
         break
 
-    if key == ord('s'): # 截图获取数据sssssssss
-        #根据检测到圆的信息，画出每一个圆
-        for circle in circles[0]:
-            # circle = circles[0][1]
-            #圆的基本信息
-            print(circle[2])
-            #坐标行列(就是圆心)
-            x, y = int(circle[0]), int(circle[1])
-            #在原图用指定颜色圈出圆，参数设定为int所以圈画存在误差
-            print(img.shape)
-            img_sub=img[y-10:y+10, x-10:x+10, :]
-            import time
-            cv2.imwrite(r"test"+str(time.time())+'.jpg', img_sub)
-        cv2.imshow('sub',img_sub)
-    
+    if key == ord('s'): # 截图获取数据
+        for i in range(1):
+            #根据检测到圆的信息，画出每一个圆
+            for circle in circles[0]:
+                # circle = circles[0][1]
+                #圆的基本信息
+                print(circle[2])
+                #坐标行列(就是圆心)
+                x, y = int(circle[0]), int(circle[1])
+                #在原图用指定颜色圈出圆，参数设定为int所以圈画存在误差
+                print(img.shape)
+                img_sub=img[y-15:y+15, x-15:x+15, :]
+                import time
+                cv2.imwrite(r".\vision\classify\data\test" +str(time.time())+'.jpg', img_sub)
+            cv2.imshow('sub',img_sub)
+        
 cv2.destroyAllWindows()
 
