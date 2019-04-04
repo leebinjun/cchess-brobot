@@ -7,7 +7,8 @@ import numpy as np
 import cv2
 from vision.svm_classify import Identify
 from strategy.moonfish.moonfish_strategy import StrategyMoonfish
-
+from pybrobot.brobot import Brobot
+import pybrobot.config as config
 
 RED = 1
 BLACK = 0
@@ -99,6 +100,7 @@ class Player:
                 id_y = (4 - (y-230)//40) if y > 220 else (9 - (y-10)//40)
                 id_x, id_y = id_x, 9-id_y
                 img_sub = img_trans[y-10:y+10, x-10:x+10, :]
+                assert img_sub.shape == (20, 20, 3)
                 res = self.ident.chessidentify_2(img_sub)
                 if res[0] == 1:
                     self.current_board[id_x + id_y*9] = 1    
@@ -119,7 +121,7 @@ class Player:
                     self.board_w[id_last//9, id_last%9] = 0
                     self.last_board = self.current_board
                     break
-        print("board:")
+        print("board_w:")
         print(self.board_w)
 
     # 由策略更新局面
@@ -139,8 +141,8 @@ class Player:
         self.board_b[new_x, new_y] = tmp
         self.board_b[last_x, last_y] = 0
         
-        # print("board_b:")
-        # print(self.board_b)
+        print("board_b:")
+        print(self.board_b)
 
         return [new_y, new_x, last_y, last_x]
 
@@ -168,7 +170,7 @@ class Player:
         situation = []
         for i in range(10):
             count = 0
-            for j in range(9):
+            for j in range(8,-1, -1):
                 if self.board[i][j] != '0':
                     if count != 0:
                         situation.append(str(count))
@@ -192,6 +194,11 @@ if __name__ == "__main__":
     aplayer = Player()
     amoonfish = StrategyMoonfish()
     aplayer.initial_board()
+    device = Brobot(port='com3', isShow=False)
+    device.connect()
+    device.set_control_signal(config.CTRL_BEGIN)
+    device.set_speedrate(config.SPEEDRATE)
+    device.go_ready_pos()
 
     while True:
         aplayer.update_board_w()
@@ -199,10 +206,12 @@ if __name__ == "__main__":
         situation = aplayer.board_to_situation()
         print(situation)
         # situation = "rCbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/7C1/9/RNBAKABNR"
-        move = amoonfish.get_move(position=situation, show_thinking = False)
+        move = amoonfish.get_move(position=situation, times = 5000, depth = 7, show_thinking = False)
         print(move)
-        aplayer.update_board_b(move)
+        alist = aplayer.update_board_b(move)
+        device.move(alist)
         situation = aplayer.board_to_situation()
+        cv2.waitKey(500)
         
 
 

@@ -25,7 +25,7 @@ class StrategyMoonfish:
         print('Moonfish')
 
     def get_move(self, position = "rCbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/7C1/9/RNBAKABNR", 
-                 player = "b", times = 500, depth = 5, show_thinking = 1):   
+                 player = "b", times = 1000, depth = 6, show_thinking = 1):   
         
         smove = "position fen " + position + " " + player + " - - 0 1"
         params = smove.split(' ', 2)

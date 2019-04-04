@@ -1,3 +1,6 @@
+import sys
+sys.path.append(r".\pybrobot")
+
 from message import Message
 import config
 
@@ -211,6 +214,29 @@ class Brobot(threading.Thread):
             # 机械臂理论坐标误差在0.5mm以内,实际误差控制在2mm以内
             if (self.x >= xx - error_value and self.x <= xx + error_value) and (self.y >= yy - error_value and self.y <= yy + error_value) and (self.z >= zz - error_value and self.z <= zz + error_value):
                 break
+
+    def move(self, alist):
+        [new_y, new_x, last_y, last_x] = alist
+        new_id  = (9-new_x)*9 + new_y
+        last_id = (9-last_x)*9 + last_y
+
+        self.print_pose()
+        
+        (x, y) = config.CHESSBOARD[last_id]
+        pos = (x, y, 132)
+        self.go_door_move( 30, pos)
+        self.isMoveOver(x, y, 132, 2)
+        self.go_air_pump(config.PUMP_SUCK)
+        time.sleep(2)
+        (x, y) = config.CHESSBOARD[new_id]
+        pos = (x, y, 135)
+        self.go_door_move( 30, pos)
+        self.isMoveOver(x, y, 135, 1)
+        self.go_air_pump(config.PUMP_STOP)
+        time.sleep(1)
+        self.go_ready_pos()
+
+
 
 
 
