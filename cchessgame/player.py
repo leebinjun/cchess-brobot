@@ -7,6 +7,7 @@ import numpy as np
 import cv2
 from vision.svm_classify import Identify
 from strategy.moonfish.moonfish_strategy import StrategyMoonfish
+from strategy.cyclone.cyclone_strategy import StrategyCyclone
 from pybrobot.brobot import Brobot
 import pybrobot.config as config
 
@@ -202,7 +203,8 @@ class Player:
 if __name__ == "__main__":
 
     aplayer = Player()
-    amoonfish = StrategyMoonfish()
+    # amoonfish = StrategyMoonfish()
+    amoonfish = StrategyCyclone()
     aplayer.initial_board()
     device = Brobot(port='com3', isShow=False)
     device.connect()
