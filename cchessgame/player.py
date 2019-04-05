@@ -131,13 +131,14 @@ class Player:
         
         for i in range(10):
             for j in range(9):
+                # 红棋吃子的情况
                 if self.board[i][j].isupper() and self.board_b[i][j] != 0:
                     self.board_b[i][j] = 0
 
         new_y  = ord(move[2]) - ord('a')
         new_x  = int(move[3])
-        last_y = ord(move[0]) - ord('a')  #h
-        last_x = int(move[1])             #7
+        last_y = ord(move[0]) - ord('a') 
+        last_x = int(move[1])            
        
         tmp = self.board_b[last_x, last_y]
         self.board_b[new_x, new_y] = tmp
@@ -147,9 +148,13 @@ class Player:
         print(self.board_b)
 
         flag_capture = False
-        # 判读是否吃子
+        # 判读黑棋是否吃子
         if self.board[new_x][new_y].isupper():
             flag_capture = True
+
+        # 如果黑棋吃子，根据capture_list更新红棋last_board
+        if flag_capture:
+            self.last_board[new_x*9+new_y] = 0 
 
         return [new_y, new_x, last_y, last_x], flag_capture
 
