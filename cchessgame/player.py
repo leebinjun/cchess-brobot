@@ -221,7 +221,7 @@ if __name__ == "__main__":
         move = amoonfish.get_move(position=situation, times = 10000, depth = 10, show_thinking = True)
         print(move)
         alist, flag_capture = aplayer.update_board_b(move)
-        device.move(alist, capture = flag_capture)
+        device.move(alist, capture = flag_capture, isShow=True)
         situation = aplayer.board_to_situation()
         cv2.waitKey(500)
         

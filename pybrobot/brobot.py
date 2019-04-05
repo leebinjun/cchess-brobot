@@ -210,14 +210,19 @@ class Brobot(threading.Thread):
 
     # 判断机械臂是否运动到目标点
     def isMoveOver(self , xx, yy, zz, error_value):
+        count = 0
         while True:
             time.sleep(0.05)
+            count += 1
             # 机械臂理论坐标误差在0.5mm以内,实际误差控制在2mm以内
             if (self.x >= xx - error_value and self.x <= xx + error_value) and (self.y >= yy - error_value and self.y <= yy + error_value) and (self.z >= zz - error_value and self.z <= zz + error_value):
                 break
+            if count == 600:
+                print("isMoveOver too long time.")
+                break
 
     # 机械臂走子：吃子 拿子 落子
-    def move(self, alist, capture = False):
+    def move(self, alist, capture = False, isShow = False):
         [new_y, new_x, last_y, last_x] = alist
         new_id  = (9-new_x)*9 + new_y
         last_id = (9-last_x)*9 + last_y
@@ -240,6 +245,7 @@ class Brobot(threading.Thread):
             self.isMoveOver(x, y, 132, 1)
             self.go_air_pump(config.PUMP_STOP)
 
+        self.print_pose()
         (x, y) = config.CHESSBOARD[last_id]
         pos = (x, y, 132)
         self.go_door_move( 30, pos)
@@ -254,6 +260,8 @@ class Brobot(threading.Thread):
         time.sleep(0.5)
         self.go_ready_pos()
         time.sleep(5)
+        if isShow:
+            print("move done.")
 
 
 
