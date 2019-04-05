@@ -56,7 +56,7 @@ while ret is True:
                 x, y = int(circle[0]), int(circle[1])
                 #在原图用指定颜色圈出圆，参数设定为int所以圈画存在误差
                 print(img.shape)
-                img_sub=img[y-15:y+15, x-15:x+15, :]
+                img_sub=img[y-10:y+10, x-10:x+10, :]
                 import time
                 cv2.imwrite(r".\vision\classify\data\test" +str(time.time())+'.jpg', img_sub)
             cv2.imshow('sub',img_sub)
