@@ -110,22 +110,29 @@ class Player:
                 img_circle = cv2.circle(img_circle, (x,y), r, (0,0,255), 1, 8, 0)
             if isShow:
                 cv2.imshow('circle', img_circle)
+                cv2.waitKey(1)
             # 计算移动棋子，更新last_board
             # AI吃子时，应该更新last_board -1
-            # print("sum:", sum(current_board))
-            if sum(self.current_board) == sum(self.last_board) or sum(self.current_board) == sum(self.last_board)-1:
+            if isShow:
+                print("sum:", sum(self.current_board))
+            if sum(self.current_board) == sum(self.last_board):
                 change_board = self.current_board - self.last_board
                 id_new  =  np.where(change_board == 1)[0]
                 id_last =  np.where(change_board == -1)[0]
                 if id_new.size == 1 and id_last.size == 1:
-                    # print("id: ", id_new, id_last)
+                    if isShow:
+                        print("id: ", id_new, id_last)
                     tmp = self.board_w[id_last//9, id_last%9]
                     self.board_w[id_new//9, id_new%9] = tmp
                     self.board_w[id_last//9, id_last%9] = 0
                     self.last_board = self.current_board
                     break
+        print("update_board_w")
         print("board_w:")
         print(self.board_w)
+        print("board_b:")
+        print(self.board_b)
+
 
     # 由策略更新局面，得到机械臂运动目标
     def update_board_b(self, move, isShow = False):
@@ -145,8 +152,11 @@ class Player:
         self.board_b[new_x, new_y] = tmp
         self.board_b[last_x, last_y] = 0
         
+        print("update_board_b")
         print("board_b:")
         print(self.board_b)
+        print("board_w:")
+        print(self.board_w)
 
         flag_capture = False
         # 判读黑棋是否吃子
@@ -156,6 +166,7 @@ class Player:
         # 如果黑棋吃子，根据capture_list更新红棋last_board
         if flag_capture:
             self.last_board[new_x*9+new_y] = 0 
+            self.board_w[new_x, new_y] = 0
 
         return [new_y, new_x, last_y, last_x], flag_capture
 
@@ -222,7 +233,8 @@ if __name__ == "__main__":
         print(move)
         alist, flag_capture = aplayer.update_board_b(move)
         device.move(alist, capture = flag_capture, isShow=True)
-        situation = aplayer.board_to_situation()
+        #TODO:@binjun 红棋未必对，不能在更新
+        # situation = aplayer.board_to_situation()
         cv2.waitKey(500)
         
 

@@ -219,6 +219,9 @@ class Brobot(threading.Thread):
                 break
             if count == 600:
                 print("isMoveOver too long time.")
+                self.set_control_signal(config.CTRL_END)
+                self.set_control_signal(config.CTRL_BEGIN)
+                time.sleep(1)
                 break
 
     # 机械臂走子：吃子 拿子 落子
@@ -276,11 +279,11 @@ if __name__ == "__main__":
     device.go_ready_pos()
     time.sleep(5)
 
-    # # 连续查看坐标
-    # times = 30 #s
-    # for i in range(times):
-    #     time.sleep(1)
-    #     device.print_pose()
+    # 连续查看坐标
+    times = 50 #s
+    for i in range(times):
+        time.sleep(1)
+        device.print_pose()
     
     # # 测试times次定点运动
     # times = 3
