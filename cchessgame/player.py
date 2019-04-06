@@ -128,8 +128,11 @@ class Player:
                     self.board_w[id_last//9, id_last%9] = 0
                     self.last_board = self.current_board
                     break
+<<<<<<< HEAD
             else:
                 print("vision change", self.current_board - self.last_board)
+=======
+>>>>>>> 630dee5a4b3072b052d781c337561e061ffe5353
         print("update_board_w")
         print("board_w:")
         print(self.board_w)
