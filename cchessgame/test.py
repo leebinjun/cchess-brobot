@@ -72,7 +72,7 @@ def drawRect(image):
 
     # 计算移动棋子，更新last_board
     # AI吃子时，应该更新last_board -1
-    # print("sum:", sum(current_board))
+    print("sum:", sum(current_board))
     if sum(current_board) == sum(last_board):
         change_board = current_board - last_board
         id_new  =  np.where(change_board == 1)[0]

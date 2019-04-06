@@ -158,7 +158,8 @@ def get_feature_1(img_path, img = None):
 
 
 # 截取棋盘
-def perTrans(img, points = [(88, 475), (538, 475), (88, 38), (538, 38)]):
+# def perTrans(img, points = [(88, 475), (538, 475), (88, 38), (538, 38)]):
+def perTrans(img, points = [(90, 463), (538, 463), (90, 23), (538, 23)]):
     # points: U L D R 4 points
     dst = np.float32([[0,0],[0,439],[439,0],[439,439]])
     src = np.float32(points)
