@@ -92,7 +92,8 @@ class Player:
             #输出返回值，方便查看类型
             if type(circles) == None.__class__:
                 continue
-            print("count:", len(circles[0, :]))
+            if isShow:
+                print("count:", len(circles[0, :]))
             # 更新current_board
             self.current_board = np.zeros(90)  #当前轮红棋位置
             for circle in circles[0]:
@@ -128,11 +129,9 @@ class Player:
                     self.board_w[id_last//9, id_last%9] = 0
                     self.last_board = self.current_board
                     break
-<<<<<<< HEAD
             else:
-                print("vision change", self.current_board - self.last_board)
-=======
->>>>>>> 630dee5a4b3072b052d781c337561e061ffe5353
+                if isShow:
+                    print("vision change", self.current_board - self.last_board)
         print("update_board_w")
         print("board_w:")
         print(self.board_w)

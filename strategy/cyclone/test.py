@@ -1,5 +1,7 @@
 # 电脑象棋引擎排名表        http://www.xqbase.com/league/ranklist.htm
 # 中国象棋程序《象棋旋风》  http://www.xqbase.com/league/xqcyclone.htm
+# Python 3 利用 subprocess 实现管道( pipe )交互操作读/写通信 - _Suwings - 博客园 https://www.cnblogs.com/suwings/p/6216279.html
+
 
 import sys
 sys.path.append(r".\strategy\cyclone")

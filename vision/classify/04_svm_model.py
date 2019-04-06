@@ -43,9 +43,11 @@ for D in [0.05]:
     svm = cv2.ml.SVM_create()
     svm.setType(cv2.ml.SVM_C_SVC)
     svm.setDegree(4.8)
+    # Kernel（核函数）：执行数据转换，根据标签或输出找出分离数据的过程。linear rbf poly……
     svm.setKernel(cv2.ml.SVM_POLY)
-    # svm.setKernel(cv2.ml.SVM_RBF)
+    # C: 错误项的惩罚参数 C。它还控制平滑决策边界和正确分类训练点之间的权衡。
     svm.setC(1)
+    # gamma：rbf 函数、Poly 函数和 S 型函数的系数。gamma 值越大，SVM 就会倾向于越准确的划分每一个训练集里的数据，这会导致泛化误差较大和过拟合问题。
     svm.setGamma(D)
 
 
