@@ -1,3 +1,4 @@
+# 测试视觉，输出局面
 # ident.chessidentify_1(img_sub) ->[[2]] 识别棋子类别， 准确率有待提升
 # ident.chessidentify_2(img_sub) ->[[1]] 识别棋子红黑
 # board 为红棋局面
@@ -10,7 +11,6 @@ import time
 import numpy as np
 import cv2
 from vision.svm_classify import Identify
-
 
 current_board = np.zeros(90)  #记录当前轮红棋位置
 last_board    = np.zeros(90)  #记录上一轮红棋位置
@@ -25,10 +25,6 @@ board = np.array([[1, 2, 3, 4, 5, 4, 3, 2, 1],
                   [0, 0, 0, 0, 0, 0, 0, 0, 0],
                   [0, 0, 0, 0, 0, 0, 0, 0, 0],
                   [0, 0, 0, 0, 0, 0, 0, 0, 0]], dtype = np.int16)
-
-
-
-
 
 def drawRect(image):
     global current_board
@@ -86,24 +82,22 @@ def drawRect(image):
             board[id_last//9, id_last%9] = 0
         last_board = current_board
 
-
-
     print("board:")
     print(board)
    
     cv2.waitKey(500)
 
 
-
-
 if __name__ == '__main__':
     
+    # python .\vision\test.py  点点，确定棋盘位置并截图，
+    # 更新.\cchessgame\utils.py中perTrans参数points = [(90, 463), (538, 463), (90, 23), (538, 23)]
+    
+    # 初始化分类器
     ident = Identify()
-
+    # 打开摄像头
     cap = cv2.VideoCapture(0)
     ret,img = cap.read()
-    
-    
     # 初始化board
     while ret is True:
         ret,img = cap.read()

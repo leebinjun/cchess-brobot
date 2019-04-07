@@ -1,4 +1,4 @@
-
+# 点点，截取象棋棋盘
 
 import time
 import numpy as np

@@ -226,10 +226,11 @@ class Brobot(threading.Thread):
 
     # 机械臂走子：吃子 拿子 落子
     def move(self, alist, capture = False, isShow = False):
+        # 计算新旧位置
         [new_y, new_x, last_y, last_x] = alist
         new_id  = (9-new_x)*9 + new_y
         last_id = (9-last_x)*9 + last_y
-
+        # 打印机械臂当前位置
         self.print_pose()
         
         # 吃子的情况

@@ -14,14 +14,18 @@ import pybrobot.config as config
 RED = 1
 BLACK = 0
 
+#TODO：@libing 趁还记得把注释加上
+#TODO：@libing import tkinter做个UI
+
 class Player:
 
-    def __init__(self, color = RED):
-        self.color = color
+    def __init__(self, color = BLACK):
+        self.color = color # 目前只作为黑棋棋手
         
-        self.board = []
-        self.current_board = np.zeros(90)  #记录当前轮红棋位置
-        self.last_board    = np.zeros(90)  #记录上一轮红棋位置
+        self.board = []                    # 描述局面的矩阵
+        self.current_board = np.zeros(90)  # 记录当前轮存在红棋的位置
+        self.last_board    = np.zeros(90)  # 记录上一轮红棋红棋的位置
+        # 红棋位置
         self.board_w = np.array([[1, 2, 3, 4, 5, 4, 3, 2, 1],
                                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
                                  [0, 6, 0, 0, 0, 0, 0, 6, 0],
@@ -32,6 +36,7 @@ class Player:
                                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
                                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
                                  [0, 0, 0, 0, 0, 0, 0, 0, 0]], dtype = np.int16)
+        # 黑棋位置
         self.board_b = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0],
                                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
                                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -42,9 +47,10 @@ class Player:
                                  [0, 6, 0, 0, 0, 0, 0, 6, 0],
                                  [0, 0, 0, 0, 0, 0, 0, 0, 0],
                                  [1, 2, 3, 4, 5, 4, 3, 2, 1]], dtype = np.int16)
+        # 初始化分类器
         self.ident = Identify()
+        # 打开摄像头
         self.cap = cv2.VideoCapture(0)
-    
             
     def initial_board(self):
         # print("initial board")
@@ -218,10 +224,15 @@ class Player:
 
 if __name__ == "__main__":
 
+    #TODO：@libing AI是黑方
+
+    # 初始化棋盘 board last_board board_w board_b              
     aplayer = Player()
+    aplayer.initial_board()
+    # 初始化引擎
     # amoonfish = StrategyMoonfish()
     amoonfish = StrategyCyclone()
-    aplayer.initial_board()
+    # 初始化机械臂
     device = Brobot(port='com3', isShow=False)
     device.connect()
     device.set_control_signal(config.CTRL_BEGIN)
@@ -229,17 +240,20 @@ if __name__ == "__main__":
     device.go_ready_pos()
 
     while True:
+        # 更新红棋状态
         aplayer.update_board_w(isShow = True)
         cv2.waitKey(500)
+        # 更新黑棋状态，由board生成ucci通信局面描述字符串
         situation = aplayer.board_to_situation()
         print(situation)
         # situation = "rCbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/7C1/9/RNBAKABNR"
+        # 由象棋引擎得到应招
         move = amoonfish.get_move(position=situation, times = 10000, depth = 10, show_thinking = True)
         print(move)
+        # 更新黑棋状态
         alist, flag_capture = aplayer.update_board_b(move)
+        # 机械臂下棋
         device.move(alist, capture = flag_capture, isShow=True)
-        #TODO:@binjun 红棋未必对，不能在更新
-        # situation = aplayer.board_to_situation()
         cv2.waitKey(500)
         
 
